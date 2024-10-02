@@ -20,7 +20,7 @@ jobs:
         cd homework_01
         python -m pip install --upgrade pip
         pip install poetry
-        poetry install
+        poetry install pandas
         pip install pytest
     - name: Run tests
       run: |

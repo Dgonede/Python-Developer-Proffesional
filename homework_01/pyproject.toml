@@ -5,3 +5,4 @@ package-mode=false
 python = "^3.12"
 pytest = "^8.3.3"
 pandas = "^2.2.3"
+pylint = "^3.3.1"

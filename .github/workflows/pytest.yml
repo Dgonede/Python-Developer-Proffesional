@@ -25,4 +25,4 @@ jobs:
     - name: Run tests
       run: |
         cd homework_01
-        pytest tests
+        poetry run pytest tests

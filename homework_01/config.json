@@ -1,0 +1,5 @@
+{
+    "LOG_DIR": "./logs",
+    "REPORT_DIR": "./reports",
+    "LOG_FILE": "logfile.json"
+}

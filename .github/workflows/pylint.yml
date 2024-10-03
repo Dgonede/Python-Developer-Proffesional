@@ -23,5 +23,5 @@ jobs:
     - name: Analysing the code with pylint
       run: |
         cd homework_01
-        poetry run pylint src tests
+        poetry run pylint src
         

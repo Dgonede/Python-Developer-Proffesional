@@ -1,0 +1,12 @@
+{
+    "http://example.com": {
+        "average": 2.15,
+        "median": 3.1,
+        "count": 2
+    },
+    "http://another-example.com": {
+        "average": 2.3,
+        "median": 2.3,
+        "count": 1
+    }
+}

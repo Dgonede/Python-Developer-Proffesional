@@ -1,6 +1,7 @@
 Для запуска приложения: 
 
-poetry run python src/log_parser.py <path_to_nginx_log>
+poetry run 
+python src/main.py --config config.json
 
 Запуск тестов: 
 
@@ -9,7 +10,8 @@ poetry run pytest tests/
 Docker:
 
 Сборка образа 
-docker build -t log-analyzer .
+docker build -t my-python-app .
 
 Запуск 
-docker run -v "path-to-logs with analyzer app" log-analyzer python /app/log_analyzer.py /app/test_nginx_log.txt
+docker run 
+--rm my-python-app

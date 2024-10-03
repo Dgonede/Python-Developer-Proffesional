@@ -1,52 +1,28 @@
-from unittest.mock import mock_open, patch
-import pandas as pd
+import os
+import json
 import pytest
-from src.log_analyzer import parse_nginx_logs, analyze_response_times
+from src.report_generator import generate_report  # Замените на фактический путь
 
+@pytest.fixture
+def setup_report_dir():
+    report_dir = "test_reports"
+    os.makedirs(report_dir, exist_ok=True)
+    yield report_dir
+    for file in os.listdir(report_dir):
+        os.remove(os.path.join(report_dir, file))
+    os.rmdir(report_dir)
 
-def test_parse_nginx_logs():
-    mock_log_data = (
-        '127.0.0.1 - - [01/Jan/2023:00:00:01 +0000] "GET / HTTP/1.1" 200 0.123\n'
-        '127.0.0.1 - - [01/Jan/2023:00:00:02 +0000] "GET /about HTTP/1.1" 200 0.456\n'
-        '127.0.0.1 - - [01/Jan/2023:00:00:03 +0000] "GET /contact HTTP/1.1" 200 0.789\n'
-        '127.0.0.1 - - [01/Jan/2023:00:00:04 +0000] "GET /error HTTP/1.1" 500\n'
-    )
+def test_generate_report(setup_report_dir):
+    url_stats = {
+        "http://example.com": [1.2, 2.3, 3.1],
+        "http://another-example.com": [0.5, 1.5, 2.0]
+    }
+    generate_report(url_stats, setup_report_dir)
 
+    # Проверяем, что JSON-файл был создан
+    json_file = os.path.join(setup_report_dir, "report-2024.10.03.json")  # Замените на актуальную дату
+    assert os.path.exists(json_file)
 
-    with patch('builtins.open', mock_open(read_data=mock_log_data)):
-        response_times = parse_nginx_logs('dummy_log_file.txt')
-        expected_response_times = pd.Series([0.123, 0.456, 0.789])
-        pd.testing.assert_series_equal(response_times, expected_response_times)
-
-
-def test_analyze_response_times():
-    response_times = pd.Series([0.123, 0.456, 0.789])
-    analysis_results = analyze_response_times(response_times)    
-    assert analysis_results['mean'] == pytest.approx(0.456)
-    assert analysis_results['median'] == 0.456
-    assert analysis_results['max'] == 0.789
-    assert analysis_results['min'] == 0.123    
-
-
-def test_parse_nginx_logs_insufficient_elements():
-    mock_log_data = (
-        '127.0.0.1 - - [01/Jan/2023:00:00:01 +0000] "GET / HTTP/1.1" 200 0.123\n'
-        '127.0.0.1 - - [01/Jan/2023:00:00:02 +0000] "GET /about HTTP/1.1" 200\n'  # Нет времени отклика
-    )
-
-    with patch('builtins.open', mock_open(read_data=mock_log_data)):
-        response_times = parse_nginx_logs('dummy_log_file.txt')
-        expected_response_times = pd.Series([0.123])
-        pd.testing.assert_series_equal(response_times, expected_response_times)
-
-
-def test_parse_nginx_logs_invalid_response_time():
-    mock_log_data = (
-        '127.0.0.1 - - [01/Jan/2023:00:00:01 +0000] "GET / HTTP/1.1" 200 abc\n'
-        '127.0.0.1 - - [01/Jan/2023:00:00:02 +0000] "GET /about HTTP/1.1" 200 0.456\n'
-    )
-    with patch('builtins.open', mock_open(read_data=mock_log_data)):
-        response_times = parse_nginx_logs('dummy_log_file.txt')
-        expected_response_times = pd.Series([0.456])
-        pd.testing.assert_series_equal(response_times, expected_response_times)
-
+    # Проверяем содержимое JSON-файла
+    with open(json_file, 'r') as f:
+        data = json

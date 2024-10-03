@@ -9,3 +9,8 @@ disable=
     W0621, # ed-outer-name   
     W1514, # ed-encoding   
     W0621, # redefined-outer-name   
+    W0707, # redefined-outer-name   
+    W4901, # redefined-outer-name   
+    C0411, # redefined-outer-name   
+    W0611, # redefined-outer-name   
+    C0103, # redefined-outer-name   

@@ -1,12 +1,20 @@
 {
     "http://example.com": {
+        "count": 2,
         "average": 2.15,
+        "max": 3.1,
         "median": 3.1,
-        "count": 2
+        "time_sum": 4.3,
+        "count_perc": 66.66666666666666,
+        "time_perc": 65.15151515151516
     },
     "http://another-example.com": {
+        "count": 1,
         "average": 2.3,
+        "max": 2.3,
         "median": 2.3,
-        "count": 1
+        "time_sum": 2.3,
+        "count_perc": 33.33333333333333,
+        "time_perc": 34.848484848484844
     }
 }

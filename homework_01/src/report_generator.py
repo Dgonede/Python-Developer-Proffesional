@@ -5,21 +5,26 @@ import os
 def generate_report(url_stats, report_dir):
     report_data = {}
     
-    # Проверка входных данных
-    print(f"Input URL stats: {url_stats}")  # Отладочный вывод
-
     # Вычисление статистики для каждого URL
     for url, times in url_stats.items():
         if times:  # Проверка на наличие данных
             report_data[url] = {
+                "count": len(times),
                 "average": sum(times) / len(times),
+                "max": max(times),
                 "median": sorted(times)[len(times) // 2],
-                "count": len(times)
+                "time_sum": sum(times)
             }
         else:
             print(f"No data for URL: {url}")  # Отладочный вывод
 
-    print(f"Generated report data: {report_data}")  # Отладочный вывод
+    # Добавление новых полей для отчета
+    total_count = sum(item["count"] for item in report_data.values())
+    total_time_sum = sum(item["time_sum"] for item in report_data.values())
+
+    for url, stats in report_data.items():
+        stats["count_perc"] = (stats["count"] / total_count) * 100 if total_count > 0 else 0
+        stats["time_perc"] = (stats["time_sum"] / total_time_sum) * 100 if total_time_sum > 0 else 0
 
     # Проверка на наличие данных для сохранения
     if not report_data:

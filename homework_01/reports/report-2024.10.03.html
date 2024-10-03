@@ -1,24 +1,21 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Report</title>
     <style type="text/css">
-        html, body {
+        body {
             background-color: black;
             color: silver;
             font-family: Arial, sans-serif;
         }
         h1 {
             text-align: center;
-            color: silver;
         }
         table {
             width: 100%;
             border-collapse: collapse;
             margin: 20px 0;
-            color: silver;
         }
         th, td {
             padding: 10px;
@@ -27,19 +24,10 @@
         }
         th {
             background-color: #333;
-            cursor: pointer;
-        }
-        td {
-            text-align: right;
-            font-size: 1.1em;
         }
         .url {
             text-align: left;
             color: #729FCF;
-            cursor: pointer;
-        }
-        .alert {
-            color: red;
         }
     </style>
 </head>
@@ -49,23 +37,39 @@
         <thead>
             <tr>
                 <th>URL</th>
-                <th>Average Time</th>
-                <th>Median Time</th>
                 <th>Count</th>
+                <th>Count %</th>
+                <th>Average Time</th>
+                <th>Max Time</th>
+                <th>Median Time</th>
+                <th>Time %</th>
+                <th>Time Sum</th>
             </tr>
         </thead>
         <tbody id="reportBody">
             <script>
-                var data = JSON.parse('{"http://example.com": {"average": 2.15, "median": 3.1, "count": 2}, "http://another-example.com": {"average": 2.3, "median": 2.3, "count": 1}}');  // Преобразование строки JSON в объект
+                var data = JSON.parse('{"http://example.com": {"count": 2, "average": 2.15, "max": 3.1, "median": 3.1, "time_sum": 4.3, "count_perc": 66.66666666666666, "time_perc": 65.15151515151516}, "http://another-example.com": {"count": 1, "average": 2.3, "max": 2.3, "median": 2.3, "time_sum": 2.3, "count_perc": 33.33333333333333, "time_perc": 34.848484848484844}}');  // Преобразование строки JSON в объект
                 var reportBody = document.getElementById('reportBody'); // Получаем элемент tbody
+                var totalCount = 0;
+                var totalTime = 0;
+
+                // Сначала подсчитаем общее количество и сумму времени
+                for (var url in data) {
+                    totalCount += data[url].count;
+                    totalTime += data[url].time_sum;
+                }
 
                 for (var url in data) {
                     // Создаем новую строку таблицы
                     var row = document.createElement('tr');
-                    row.innerHTML = '<td class="url"><a href="https://example.com' + url + '" target="_blank">' + url + '</a></td>' +
+                    row.innerHTML = '<td class="url"><a href="' + url + '" target="_blank">' + url + '</a></td>' +
+                                    '<td>' + data[url].count + '</td>' +
+                                    '<td>' + ((data[url].count / totalCount) * 100).toFixed(2) + '%</td>' +
                                     '<td>' + data[url].average.toFixed(2) + '</td>' +
+                                    '<td>' + data[url].max.toFixed(2) + '</td>' +
                                     '<td>' + data[url].median.toFixed(2) + '</td>' +
-                                    '<td>' + data[url].count + '</td>';
+                                    '<td>' + ((data[url].time_sum / totalTime) * 100).toFixed(2) + '%</td>' +
+                                    '<td>' + data[url].time_sum.toFixed(2) + '</td>';
                     reportBody.appendChild(row); // Добавляем строку в tbody
                 }
             </script>

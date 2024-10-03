@@ -15,3 +15,5 @@ docker build -t my-python-app .
 Запуск 
 docker run 
 --rm my-python-app
+
+Файлы логов лежат в папке report/

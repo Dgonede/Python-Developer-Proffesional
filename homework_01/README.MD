@@ -16,4 +16,5 @@ docker build -t my-python-app .
 docker run 
 --rm my-python-app
 
-Файлы логов лежат в папке report/
+Отчеты хранятся в папке reports/
+Логи записываются в logfile.json

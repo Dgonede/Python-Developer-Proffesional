@@ -2,6 +2,7 @@ import os
 import json
 import pytest
 from src.report_generator import generate_report  # Замените на фактический путь
+import datetime
 
 @pytest.fixture
 def setup_report_dir():
@@ -19,10 +20,13 @@ def test_generate_report(setup_report_dir):
     }
     generate_report(url_stats, setup_report_dir)
 
+    # Получаем текущую дату для имени файла
+    report_date = datetime.datetime.now().strftime('%Y.%m.%d')
+    json_file = os.path.join(setup_report_dir, f"report-{report_date}.json")
+
     # Проверяем, что JSON-файл был создан
-    json_file = os.path.join(setup_report_dir, "report-2024.10.03.json")  # Замените на актуальную дату
     assert os.path.exists(json_file)
 
     # Проверяем содержимое JSON-файла
     with open(json_file, 'r') as f:
-        data = json
+        data = json.load(f)

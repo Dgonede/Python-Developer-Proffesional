@@ -15,3 +15,4 @@ disable=
     W0611, # redefined-outer-name   
     C0103, # redefined-outer-name   
     R0914, # redefined-outer-name   
+    W0718, # redefined-outer-name   

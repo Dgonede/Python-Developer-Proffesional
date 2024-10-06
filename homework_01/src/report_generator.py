@@ -2,7 +2,7 @@ import json
 import datetime
 import os
 
-def generate_report(url_stats, report_dir):
+def calculate_statistics(url_stats):
     report_data = {}
     
     # Вычисление статистики для каждого URL
@@ -25,6 +25,12 @@ def generate_report(url_stats, report_dir):
     for url, stats in report_data.items():
         stats["count_perc"] = (stats["count"] / total_count) * 100 if total_count > 0 else 0
         stats["time_perc"] = (stats["time_sum"] / total_time_sum) * 100 if total_time_sum > 0 else 0
+
+    return report_data
+
+def generate_report(url_stats, report_dir):
+    # Вычисляем статистику
+    report_data = calculate_statistics(url_stats)
 
     # Проверка на наличие данных для сохранения
     if not report_data:

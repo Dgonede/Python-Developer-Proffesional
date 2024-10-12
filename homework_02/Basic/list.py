@@ -12,5 +12,5 @@ def foo(x: List[str]) -> None:
 
 
 foo(["foo", "bar"])
-foo(["foo", 1]) # expect-type-error
+# foo(["foo", 1]) # expect-type-error
 

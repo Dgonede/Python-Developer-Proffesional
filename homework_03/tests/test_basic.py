@@ -1,7 +1,7 @@
 """Basic tests for Byterun."""
 
 from __future__ import print_function
-import vmtest
+from . import vmtest
 
 import six
 

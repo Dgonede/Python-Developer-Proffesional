@@ -22,7 +22,7 @@ jobs:
         pip install poetry
         poetry add pytest
         poetry add pytest-cov
-        poerty add six
+        poetry add six
         poetry install
     - name: Run tests
       run: |

@@ -27,3 +27,5 @@ jobs:
       run: |
         cd homework_01
         poetry run pytest -s --cov --cov-report html --cov-fail-under 75 tests
+        cd homework_03
+        poetry run pytest -v

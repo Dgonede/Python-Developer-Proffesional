@@ -28,3 +28,8 @@ jobs:
       run: |
         cd homework_03
         poetry run pytest -v
+
+    - name: Run homework_04 tests
+      run: |
+        cd homework_04
+        poetry run pytest -v test.py    

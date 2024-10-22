@@ -27,6 +27,7 @@ class TestSuite(unittest.TestCase):
         return hashlib.sha512((datetime.datetime.now().strftime("%Y%m%d%H") + api.ADMIN_SALT).encode('utf-8')).hexdigest()
 
     def get_response(self, request):
+        print(f"Request sent: {request}")  # Логирование запроса
         return api.method_handler({"body": request, "headers": self.headers}, self.context, self.settings)
 
     def set_valid_auth(self, request):
@@ -76,9 +77,19 @@ class TestSuite(unittest.TestCase):
         {"email": "stupnikov@otus.ru", "gender": 1, "last_name": 2},
     ])
     def test_invalid_score_request(self, arguments):
-        request = {"account": "horns&hoofs", "login": "h&f", "method": "online_score", "arguments": arguments}
+        request = {
+            "account": "horns&hoofs", 
+            "login": "h&f", 
+            "method": "online_score", 
+            "arguments": arguments
+        }
         self.set_valid_auth(request)
+        
+        print(f"Testing with request: {request}")  # Проверяем полный запрос
+        
         response, code = self.get_response(request)
+        print(f"Response: {response}, Code: {code}")  # Выводим ответ и код
+        
         self.assertEqual(api.INVALID_REQUEST, code, arguments)
         self.assertTrue(len(response))
 

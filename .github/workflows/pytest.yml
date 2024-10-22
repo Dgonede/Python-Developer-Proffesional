@@ -17,19 +17,13 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        cd homework_03
+        cd homework_04
         python -m pip install --upgrade pip
         pip install poetry
         poetry add pytest
         poetry add pytest-cov
-        poetry add six
         poetry install
     - name: Run tests
       run: |
-        cd homework_03
-        poetry run pytest -v
-
-    - name: Run homework_04 tests
-      run: |
         cd homework_04
-        poetry run pytest -v test.py    
+        poetry run pytest -v test.py   

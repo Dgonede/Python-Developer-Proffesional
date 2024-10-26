@@ -37,59 +37,66 @@ GENDERS = {
 }
 
 
-class CharField(object):
+class CharField:
     def __init__(self, required=False, nullable=False):
         self.required = required
         self.nullable = nullable
 
-
-class ArgumentsField(object):
-    def __init__(self, required=False, nullable=False):
-        self.required = required
-        self.nullable = nullable
+    def validate(self, value):
+        if self.required and not value:
+            raise ValueError("This field is required.")
 
 
 class EmailField(CharField):
-    def __init__(self, required=False, nullable=False):
-        super().__init__(required, nullable)
+    def validate(self, value):
+        super().validate(value)
+        if value and not self.validate_email(value):
+            raise ValueError(f"Invalid email format: {value}")
+
+    @staticmethod
+    def validate_email(email):
+        email_regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+        return re.match(email_regex, email) is not None
 
 
-class PhoneField(object):
-    def __init__(self, required=False, nullable=False):
-        self.required = required
-        self.nullable = nullable
+class PhoneField(CharField):
+    def validate(self, value):
+        super().validate(value)
+        if value:
+            phone = str(value).strip()
+            if len(phone) == 11 and phone[0] == '7':
+                return
+            elif len(phone) == 10:
+                phone = '7' + phone
+            else:
+                raise ValueError(f"Phone must be a string of 11 digits starting with 7. Provided: {value}")
+            if not re.match(r'^\d{11}$', phone):
+                raise ValueError(f"Phone must be a string of 11 digits starting with 7. Provided: {value}")
 
 
-class DateField(object):
-    def __init__(self, required=False, nullable=False):
-        self.required = required
-        self.nullable = nullable
+class BirthDayField(CharField):
+    def validate(self, value):
+        super().validate(value)
+        if value:
+            try:
+                datetime.datetime.strptime(value, "%d.%m.%Y")
+            except ValueError:
+                raise ValueError(f"Invalid birthday format: {value}")
 
 
-class BirthDayField(DateField):
-    def __init__(self, required=False, nullable=False):
-        super().__init__(required, nullable)
+class GenderField(CharField):
+    def validate(self, value):
+        super().validate(value)
+        if value:
+            try:
+                gender = int(value)
+                if gender not in GENDERS:
+                    raise ValueError(f"Invalid gender value: {gender}")
+            except ValueError:
+                raise ValueError(f"Gender must be an integer: {value}")
 
 
-class GenderField(object):
-    def __init__(self, required=False, nullable=False):
-        self.required = required
-        self.nullable = nullable
-
-
-class ClientIDsField(object):
-    def __init__(self, required=False, nullable=False):
-        self.required = required
-        self.nullable = nullable
-
-
-class ClientsInterestsRequest(object):
-    def __init__(self, client_ids, date=None):
-        self.client_ids = client_ids
-        self.date = date
-
-
-class OnlineScoreRequest(object):
+class OnlineScoreRequest:
     def __init__(self, first_name=None, last_name=None, email=None, phone=None, birthday=None, gender=None):
         self.first_name = first_name
         self.last_name = last_name
@@ -97,9 +104,58 @@ class OnlineScoreRequest(object):
         self.phone = phone
         self.birthday = birthday
         self.gender = gender
+        self.errors = {}
+
+    def validate(self):
+        email_field = EmailField(required=True)
+        phone_field = PhoneField(required=True)
+        birthday_field = BirthDayField(required=False)
+        gender_field = GenderField(required=False)
+
+        # Валидация каждого из полей
+        try:
+            email_field.validate(self.email)
+        except ValueError as e:
+            self.errors['email'] = str(e)
+
+        try:
+            phone_field.validate(self.phone)
+        except ValueError as e:
+            self.errors['phone'] = str(e)
+
+        if self.birthday:
+            try:
+                birthday_field.validate(self.birthday)
+            except ValueError as e:
+                self.errors['birthday'] = str(e)
+
+        if self.gender is not None:
+            try:
+                gender_field.validate(self.gender)
+            except ValueError as e:
+                self.errors['gender'] = str(e)
+
+        if self.errors:
+            raise ValueError(self.errors)
+
+    @property
+    def email_value(self):
+        return self.email
+
+    @property
+    def phone_value(self):
+        return self.phone
+
+    @property
+    def birthday_value(self):
+        return self.birthday
+
+    @property
+    def gender_value(self):
+        return self.gender
 
 
-class MethodRequest(object):
+class MethodRequest:
     def __init__(self, account=None, login=None, token=None, arguments=None, method=None):
         self.account = account
         self.login = login
@@ -147,61 +203,23 @@ def method_handler(request, ctx, store):
 
 
 def handle_online_score(arguments, ctx):
-    required_fields = ['phone', 'email']
+    request = OnlineScoreRequest(
+        first_name=arguments.get('first_name'),
+        last_name=arguments.get('last_name'),
+        email=arguments.get('email'),
+        phone=arguments.get('phone'),
+        birthday=arguments.get('birthday'),
+        gender=arguments.get('gender')
+    )
 
-    
-    missing_fields = [field for field in required_fields if field not in arguments]
-    if missing_fields:
-        logging.warning(f"Missing required fields: {missing_fields}")
-        return "Missing required fields", INVALID_REQUEST
-
-    if not validate_email(arguments['email']):
-        logging.warning(f"Invalid email format: {arguments['email']}")
-        return "Invalid email format", INVALID_REQUEST
-
-    # Проверка на формат телефонного номера
-    phone = str(arguments.get('phone', '')).strip()  # получаем телефон
-    if len(phone) == 11 and phone[0] in {'7', '8'}:  # Если начинается с '7' или '8'
-        phone = phone[1:]  # Убираем код страны
-    if not phone or not re.match(r'^\d{10}$', phone):  # проверяем 10 цифр
-        logging.warning(f"Invalid phone number format: {arguments['phone']}")
-        return "Phone must be a string of 10 digits.", INVALID_REQUEST
-
-    # Проверяем на gender
-    if 'gender' in arguments:
-        try:
-            gender = int(arguments['gender'])
-            if gender not in GENDERS:
-                logging.warning(f"Invalid gender value: {gender}")
-                return "Invalid gender value", INVALID_REQUEST 
-        except ValueError:
-            logging.warning(f"Gender value is not an integer: {arguments['gender']}")
-            return "Gender must be an integer", INVALID_REQUEST
-
-    # Проверка на first_name и last_name
-    for field in ['first_name', 'last_name']:
-        if field in arguments and not isinstance(arguments[field], str):
-            logging.warning(f"{field.replace('_', ' ').capitalize()} must be a string: {arguments[field]}")
-            return f"{field.replace('_', ' ').capitalize()} must be a string", INVALID_REQUEST
-
-    # Проверка на birthday
-    if 'birthday' in arguments:
-        try:
-            datetime.datetime.strptime(arguments['birthday'], "%d.%m.%Y")  # Проверка формата даты
-        except ValueError:
-            logging.warning(f"Invalid birthday format: {arguments['birthday']}")
-            return "Invalid birthday format. Use DD.MM.YYYY.", INVALID_REQUEST
+    try:
+        request.validate()
+    except ValueError as e:
+        logging.warning(f"Validation errors: {e.args[0]}")
+        return e.args[0], INVALID_REQUEST
 
     ctx["has"] = arguments
     score = 42
-
-    # Если присутствует gender, добавляем к счёту
-    if 'gender' in arguments and arguments['gender'] in GENDERS:
-        score += 10
-
-    if ctx.get("account") == ADMIN_LOGIN:
-        return {"score": score}, OK
-
     return {"score": score}, OK
 
 
@@ -214,12 +232,12 @@ def handle_clients_interests(arguments, ctx):
     if not all(isinstance(x, int) for x in client_ids):
         return "Invalid client_ids format", INVALID_REQUEST
 
-    # Проверка на дату
+    
     if "date" in arguments:
         if not isinstance(arguments["date"], str):
             return "Invalid date format. Expected string.", INVALID_REQUEST
 
-        # Проверка формата даты
+        
         try:
             datetime.datetime.strptime(arguments["date"], "%d.%m.%Y")
         except ValueError:
@@ -231,12 +249,6 @@ def handle_clients_interests(arguments, ctx):
     interests = {client_id: [f"interest_{client_id}_1", f"interest_{client_id}_2"] for client_id in client_ids}
 
     return interests, OK
-
-
-def validate_email(email):
-    # проверка формата email
-    email_regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
-    return re.match(email_regex, email) is not None
 
 
 class MainHTTPHandler(BaseHTTPRequestHandler):
@@ -273,10 +285,7 @@ class MainHTTPHandler(BaseHTTPRequestHandler):
         self.send_response(code)
         self.send_header("Content-Type", "application/json")
         self.end_headers()
-        if code not in ERRORS:
-            r = {"response": response, "code": code}
-        else:
-            r = {"error": response or ERRORS.get(code, "Unknown Error"), "code": code}
+        r = {"response": response, "code": code} if code not in ERRORS else {"error": response or ERRORS.get(code, "Unknown Error"), "code": code}
         context.update(r)
         logging.info(context)
         self.wfile.write(json.dumps(r).encode('utf-8'))

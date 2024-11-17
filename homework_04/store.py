@@ -1,28 +1,31 @@
-import redis
-import time
+import sqlite3
 
 class Store:
-    def __init__(self, host='localhost', port=6379, db=0):
-        self.client = redis.StrictRedis(host=host, port=port, db=db)
-        self.max_retries = 5
-        self.retry_delay = 1
+    def __init__(self, db_name=':memory:'):
+        self.connection = sqlite3.connect(db_name)
+        self.cursor = self.connection.cursor()
+        self.create_table()
+
+    def create_table(self):
+        self.cursor.execute('''
+            CREATE TABLE IF NOT EXISTS cache (
+                key TEXT PRIMARY KEY,
+                value TEXT
+            )
+        ''')
+        self.connection.commit()
 
     def get(self, key):
-        for _ in range(self.max_retries):
-            try:
-                return self.client.get(key)
-            except redis.ConnectionError:
-                time.sleep(self.retry_delay)
-        raise Exception("Could not connect to the store")
+        self.cursor.execute('SELECT value FROM cache WHERE key = ?', (key,))
+        result = self.cursor.fetchone()
+        return result[0] if result else None
 
     def cache_get(self, key):
         return self.get(key)
 
-    def cache_set(self, key, value, timeout):
-        for _ in range(self.max_retries):
-            try:
-                self.client.setex(key, timeout, value)
-                return
-            except redis.ConnectionError:
-                time.sleep(self.retry_delay)
-        raise Exception("Could not connect to the store")
+    def cache_set(self, key, value):
+        self.cursor.execute('INSERT OR REPLACE INTO cache (key, value) VALUES (?, ?)', (key, value))
+        self.connection.commit()
+
+    def close(self):
+        self.connection.close()

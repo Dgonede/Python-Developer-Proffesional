@@ -1,0 +1,10 @@
+services:
+  pg:
+    image: postgres
+    environment:
+      POSTGRES_DB: homework
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: 123321
+    ports:
+      - "5432:5432"
+  

@@ -25,6 +25,6 @@ jobs:
         poetry install
 
     - name: Run mypy
-      working-directory: homework_02  
+      working-directory: homework_02/Basic  
       run: |
         poetry run mypy .  # Проверяем все модули в homework_02

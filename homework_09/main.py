@@ -28,6 +28,12 @@ class User(BaseModel):
     email: str
     age: int
 
+class ModelInput(BaseModel):
+    input_data: str
+
+class ModelOutput(BaseModel):
+    result: str
+
 #функция для проверки пользователя
 def authentificate_user(credentials: HTTPBasicCredentials):
     user = fake_users_db.get(credentials.username)
@@ -51,3 +57,9 @@ def create_user(user:User):
     user_data["hashed_password"] = hashed_password
     fake_users_db[user.username] = user_data
     return user
+
+
+@app.post("/model/", response_model=ModelOutput)
+def run_model(input: ModelInput):
+    result = f"Processed input: {input.input_data}"
+    return ModelOutput(result=result)    

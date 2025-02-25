@@ -12,7 +12,7 @@ model = GPT2LMHeadModel.from_pretrained(model_name)
 
 # Загрузка данных
 with open("data/data.txt", "r", encoding="utf-8") as file:
-    dataset = file.read().strip()  # Читаем весь текст как одну строку
+    dataset = file.read().strip()
 
 # Подготовка данных
 train_encodings = tokenizer(dataset, truncation=True, padding=True, return_tensors="pt")
@@ -24,7 +24,7 @@ class CustomDataset(torch.utils.data.Dataset):
 
     def __getitem__(self, idx):
         item = {key: val[idx] for key, val in self.encodings.items()}
-        item['labels'] = item['input_ids']  # Устанавливаем labels равными input_ids
+        item['labels'] = item['input_ids']
         return item
 
     def __len__(self):

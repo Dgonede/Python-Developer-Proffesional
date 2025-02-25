@@ -2,6 +2,7 @@ import numpy as np
 import pytest
 from logistic_regression import LogisticRegression
 
+
 def test_train():
     # Создаем модель
     model = LogisticRegression()
@@ -24,6 +25,7 @@ def test_train():
 
     # Проверяем, что потери не NaN
     assert not np.isnan(model.loss_history).any(), "Loss history should not contain NaN values"
+
 
 def test_append_biases():
     X = np.array([[1, 2], [3, 4]])

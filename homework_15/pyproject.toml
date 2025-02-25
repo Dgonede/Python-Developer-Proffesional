@@ -1,0 +1,9 @@
+[tool.poetry]
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.12"
+cython = "^3.0.12"
+protobuf = "^5.29.3"
+conan = "^2.12.2"
+

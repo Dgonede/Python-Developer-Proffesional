@@ -4,6 +4,7 @@ from __future__ import print_function
 from tests import vmtest
 import six
 
+
 PY3, PY2 = six.PY3, not six.PY3
 
 class TestIt(vmtest.VmTestCase):

@@ -14,7 +14,7 @@ import reprlib
 
 
 
-from .pyobj import Frame, Block, Method, Function, Generator
+from pyobj import Frame, Block, Method, Function, Generator
 
 log = logging.getLogger(__name__)
 
@@ -203,8 +203,6 @@ class VirtualMachine:
         log.info(f"{indent}{op}")
 
     def dispatch(self, byteName, arguments):
-    
-        why = None
         try:
             if byteName.startswith('UNARY_'):
                 self.unaryOperator(byteName[6:])
@@ -215,11 +213,11 @@ class VirtualMachine:
             elif 'SLICE+' in byteName:
                 self.sliceOperator(byteName)
             elif byteName == 'RESUME':
-                # Проверка наличия активного генератора
+            # Проверка наличия активного генератора
                 if self.frame.generator is None:
                     log.error("Attempted to resume a generator, but none is active.")
                     raise VirtualMachineError("No generator to resume")
-                # Обработка байт-кода RESUME
+            # Обработка байт-кода RESUME
                 why = self.handle_resume(*arguments)
             else:
                 bytecode_fn = getattr(self, f'byte_{byteName}', None)

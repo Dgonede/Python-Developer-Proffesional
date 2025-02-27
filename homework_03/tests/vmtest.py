@@ -9,7 +9,6 @@ import types
 import unittest
 
 import six
-
 from byterun.pyvm2 import VirtualMachine, VirtualMachineError
 
 # Make this false if you need to run the debugger inside a test.

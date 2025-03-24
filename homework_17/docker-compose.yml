@@ -1,0 +1,8 @@
+version: '3.8'
+
+services:
+  memcached:
+    image: memcached:latest
+    ports:
+      - "11211:11211"
+    command: ["memcached", "-m", "64", "-p", "11211", "-u", "memcache"]

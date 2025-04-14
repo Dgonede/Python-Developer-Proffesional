@@ -11,6 +11,13 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+<<<<<<< HEAD:homework_08/home_project/home_project/settings.py
+=======
+import sys
+import os
+from django.http import HttpResponseNotFound
+
+>>>>>>> 73d7c20 (add_django_project):Zootopiya/zootopiya_project/zootopiya_project/settings.py
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,7 +27,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
+<<<<<<< HEAD:homework_08/home_project/home_project/settings.py
 SECRET_KEY = 'django-insecure-f(@#%io01^kdp6v$nz9ivj80#eh+h(^gbjmgkkmxs(h*nzz(oq'
+=======
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'unsafe-default-key')
+>>>>>>> 73d7c20 (add_django_project):Zootopiya/zootopiya_project/zootopiya_project/settings.py
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -40,8 +51,21 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+<<<<<<< HEAD:homework_08/home_project/home_project/settings.py
     'home_app',
+=======
+    'django.contrib.postgres',
+
+    'main',
+    'goods',
+    'users',
+    'carts',
+    'orders',
+    'chatbot',
+>>>>>>> 73d7c20 (add_django_project):Zootopiya/zootopiya_project/zootopiya_project/settings.py
 ]
+
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

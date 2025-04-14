@@ -20,7 +20,16 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+<<<<<<< HEAD:homework_08/home_project/home_project/urls.py
     path("home_app/", include("home_app.urls")),
+=======
+    path('', include('main.urls', namespace='main')),
+    path('catalog/', include('goods.urls', namespace='catalog')),
+    path('user/', include('users.urls', namespace='user')),
+    path('cart/', include('carts.urls', namespace='cart')),
+    path('orders/', include('orders.urls', namespace='orders')),
+    path("", include("chatbot.urls")),
+>>>>>>> 73d7c20 (add_django_project):Zootopiya/zootopiya_project/zootopiya_project/urls.py
 ]
 
 if settings.DEBUG:

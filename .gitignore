@@ -1,6 +1,10 @@
 .venv/
+<<<<<<< HEAD
 homework_04\.pytest_cache
 results
 instruction.md
 form_filtr
 chat_bot
+=======
+Zootopiya/zootopiya_project/zootopiya_project/settings.py
+>>>>>>> 73d7c20 (add_django_project)
